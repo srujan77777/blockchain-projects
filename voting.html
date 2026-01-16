@@ -1,20 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Voting DApp</title>
+  <title>Simple Voting DApp</title>
 </head>
 <body>
 
-<h2>Decentralized Voting</h2>
+<h2>Simple Voting</h2>
 
 <button id="connectBtn">Connect Wallet</button>
-<p id="walletAddress">Not connected</p>
+<p id="wallet">Not connected</p>
 
+<h3>Candidates</h3>
 <div id="candidates"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
-<script src="js/wallet.js"></script>
-<script src="js/voting.js"></script>
+
+<script>
+// 🔴 PASTE YOUR CONTRACT ADDRESS HERE
+const CONTRACT_ADDRESS = "0x5cbea082cbe025609550da2795d57bb272f50a70";
+
+// 🔴 INLINE ABI (NO JSON FILES)
+const ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "string[]",
+        "name": "candidateNames",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "candidateIndex", "type": "uint256" }
+    ],
+    "name": "vote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCandidatesCount",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "candidates",
+    "outputs": [
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "uint256", "name": "voteCount", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
+let provider, signer;
+
+document.getElementById("connectBtn").onclick = async () => {
+  if (!window.ethereum) {
+    alert("Install MetaMask");
+    return;
+  }
+
+  await ethereum.request({ method: "eth_requestAccounts" });
+
+  provider = new ethers.BrowserProvider(window.ethereum);
+  signer = await provider.getSigner();
+
+  document.getElementById("wallet").innerText =
+    "Connected: " + await signer.getAddress();
+
+  loadCandidates();
+};
+
+async function loadCandidates() {
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+  const div = document.getElementById("candidates");
+  div.innerHTML = "";
+
+  const count = Number(await contract.getCandidatesCount());
+
+  for (let i = 0; i < count; i++) {
+    const c = await contract.candidates(i);
+
+    const btn = document.createElement("button");
+    btn.innerText = `${c[0]} (${c[1]})`;
+
+    btn.onclick = async () => {
+      const tx = await contract.vote(i);
+      await tx.wait();
+      loadCandidates();
+    };
+
+    div.appendChild(btn);
+    div.appendChild(document.createElement("br"));
+  }
+}
+</script>
 
 </body>
 </html>
