@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Digital Certificate Verifier</title>
+</head>
+<body>
+
+<h2>Digital Certificate Verifier</h2>
+
+<button id="connectBtn">Connect Wallet</button>
+<p id="wallet">Not connected</p>
+
+<hr>
+
+<h3>Issue Certificate (Issuer only)</h3>
+<input id="certId" placeholder="Certificate ID" />
+<input id="student" placeholder="Student Name" />
+<input id="course" placeholder="Course Name" />
+<button id="issueBtn">Issue Certificate</button>
+
+<hr>
+
+<h3>Verify Certificate</h3>
+<input id="verifyId" placeholder="Certificate ID" />
+<button id="verifyBtn">Verify</button>
+<p id="result"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.14.0/dist/ethers.umd.min.js"></script>
+
+<script>
+// 🔴 PASTE YOUR CONTRACT ADDRESS HERE
+const CONTRACT_ADDRESS = "PASTE_CONTRACT_ADDRESS_HERE";
+
+// 🔴 INLINE ABI
+const ABI = [
+  {
+    "inputs": [
+      { "type": "string", "name": "certId" },
+      { "type": "string", "name": "studentName" },
+      { "type": "string", "name": "course" }
+    ],
+    "name": "issueCertificate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "type": "string", "name": "certId" }
+    ],
+    "name": "verifyCertificate",
+    "outputs": [
+      { "type": "string", "name": "" },
+      { "type": "string", "name": "" },
+      { "type": "bool", "name": "" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
+let provider, signer, contract;
+
+document.getElementById("connectBtn").onclick = async () => {
+  if (!window.ethereum) {
+    alert("Install MetaMask");
+    return;
+  }
+
+  await ethereum.request({ method: "eth_requestAccounts" });
+
+  provider = new ethers.BrowserProvider(window.ethereum);
+  signer = await provider.getSigner();
+  contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+  document.getElementById("wallet").innerText =
+    "Connected: " + await signer.getAddress();
+};
+
+document.getElementById("issueBtn").onclick = async () => {
+  try {
+    const tx = await contract.issueCertificate(
+      certId.value,
+      student.value,
+      course.value
+    );
+    await tx.wait();
+    alert("Certificate issued!");
+  } catch (err) {
+    alert("Only issuer can issue certificates");
+  }
+};
+
+document.getElementById("verifyBtn").onclick = async () => {
+  const res = await contract.verifyCertificate(verifyId.value);
+
+  if (!res[2]) {
+    result.innerText = "❌ Certificate not valid";
+  } else {
+    result.innerText =
+      "✅ Valid Certificate\nStudent: " + res[0] + "\nCourse: " + res[1];
+  }
+};
+</script>
+
+</body>
+</html>
