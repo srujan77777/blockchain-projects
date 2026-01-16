@@ -4,31 +4,31 @@
       {
         "internalType": "string[]",
         "name": "candidateNames",
-        "type": "string[]"
+        "type": "string[]",
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "constructor"
+    "type": "constructor",
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
         "name": "candidateIndex",
-        "type": "uint256"
+        "type": "uint256",
       }
     ],
     "name": "vote",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
+    "type": "function",
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
         "name": "",
-        "type": "uint256"
+        "type": "uint256",
       }
     ],
     "name": "candidates",
@@ -36,16 +36,16 @@
       {
         "internalType": "string",
         "name": "name",
-        "type": "string"
+        "type": "string",
       },
       {
         "internalType": "uint256",
         "name": "voteCount",
-        "type": "uint256"
+        "type": "uint256",
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
   },
   {
     "inputs": [],
@@ -54,18 +54,18 @@
       {
         "internalType": "uint256",
         "name": "",
-        "type": "uint256"
+        "type": "uint256",
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
   },
   {
     "inputs": [
       {
         "internalType": "address",
         "name": "",
-        "type": "address"
+        "type": "address",
       }
     ],
     "name": "hasVoted",
@@ -73,11 +73,11 @@
       {
         "internalType": "bool",
         "name": "",
-        "type": "bool"
+        "type": "bool",
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
   }
 ]
 
